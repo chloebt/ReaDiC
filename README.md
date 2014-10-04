@@ -6,7 +6,7 @@ Read Discursive Corpus : code to read and build feature structures for pdtb like
 
 # Description
 
-
+Le programme récupère les instances de relations voulues dans le corpus et produit en sortie des fichiers de traits.
 
 
 
