@@ -1,18 +1,28 @@
-ReaDisc
+ReaDiC
 =======
-readCorpus : code to read and build feature structures for pdtb like corpora
 
-# Code
-### read_pdtb_like.sh
-Script shell partant du corpus format PDTB et aboutissant notamment aux fichiers de traits.
+Read Discursive Corpus : code to read and build feature structures for pdtb like corpora.
+
+
+# Description
+
+
+
+
+
+# Code : *read_pdtb_like.sh*
+
+Script shell partant du corpus format PDTB pour écrire des fichiers texte contenant tous les exemples et d'autres informations.
+
+**Pour l'instant, problème avec la recuperation des arguments dans le script shell quand ils sont ensuite passés en option si on a defini une valeur par défaut. Donc appel à readCorpus/py/readCorpus.py commenté dans le script shell : utiliser le script shell pour générer les fichiers en sortie des scripts Java puis lancer le script python.**
 
 Les chemins vers les programmes utilisés sont en dur dans le script shell, **il faut modifier ces chemins**. (TODO : à modifier)
 
-Le script est composé de 4 étapes, il lance les 4 scripts décrits ci-après. Une fois que les 3 premières étapes on été faites, il n'est plus utile d'utiliser le script shell : utiliser directement le script python (readCorpus/py/readCorpus.py) pour récupérer les exemples voulus avec les traits voulus.
+Le script est composé de 3 étapes, il lance les 3 scripts décrits ci-après. Les données en sortie sont celles à utiliser en entrée du script python *ReaDiC/py/readCorpus.py*. Pour l'utiliser, on donne toutes les options décrites pour les 3 codes suivants.
 
-### readCorpus/java/pdtbRead.jar : 
+### ReaDiC/java/pdtbRead.jar : 
 
-Lit le corpus PDTB et ecrit en sortie des fichiers contenant tous les exemples (implicit, explicit, altlex, entrel et norel) associés à des informations issus de l'annotation (relations, arguments ...) et des informations utilisées pour calculer des traits par la suite (règles de production pour chaque argument, tête des arguments ...). L'id de l'exemple informe sur son type, cf plus bas. Se base sur l'API Java de Penn.
+Lit le corpus PDTB et écrit en sortie des fichiers contenant tous les exemples (implicit, explicit, altlex, entrel et norel) associés à des informations issus de l'annotation (relations, arguments ...) et des informations utilisées pour calculer des traits par la suite (règles de production pour chaque argument, tête des arguments ...). L'id de l'exemple informe sur son type, cf plus bas. Se base sur l'API Java de Penn.
 
 Require : pdtb.jar, version java ? 
 
@@ -27,9 +37,9 @@ Require : pdtb.jar, version java ?
 ##### Format fichiers en sortie : TODO (très moche)
 
 
-### readCorpus/java/pdtbDiscourseReading.jar : 
+### ReaDiC/java/pdtbDiscourseReading.jar : 
 
-Lit (à nouveau) le corpus PDTB et écrit en sortie des fichiers contenant les exemples explicites (in discourse reading, exemple positif) et les exemples correspondant à des formes de connecteur en emploi non discursif (no discourse reading, exemple négatif). L'id de l'exemple informe sur son type : si l'id contient _p_, exemple positif, si l'id contient _f_, exemple négatif. Se base sur l'API Java de Penn.
+Lit (à nouveau) le corpus PDTB et écrit en sortie des fichiers contenant les exemples explicites (en emploi discursif, exemple positif) et les exemples correspondant à des formes de connecteur en emploi non discursif (emploi non discursif, exemple négatif). L'id de l'exemple informe sur son type : si l'id contient _p_, exemple positif, si l'id contient _f_, exemple négatif. Se base sur l'API Java de Penn.
   
 Require : pdtb.jar, version java ?
 
@@ -42,43 +52,45 @@ Require : pdtb.jar, version java ?
 
 ##### Format fichiers en sortie : TODO (très moche)
 
-### readCorpus/py/union_javaFiles.py : 
+### ReaDiC/py/union_javaFiles.py : 
 
-Lit les deux corpus précédemment construit pour aboutir à un seul corpus contenant toutes les informations (ie ajoute aux exemples explicites du premier corpus les informations présentes seulement dans le second et TODO (en cours) ajoute les exemples d'emploi non discursif).
+Lit les deux corpus précédemment construit pour aboutir à un seul corpus contenant toutes les informations (ie ajoute aux exemples explicites du premier corpus les informations présentes seulement dans le second et ajoute les exemples d'emploi non discursif).
 
 Require : none
 
 ##### Options :
-* **-i** $JAVAOUTR : répertoire en sortie de la première étape ;
-* **-g** $JAVAOUTD : répertoire en sortie de la seconde étape ;
-* **-o** $JAVAOUT : répertoire de sortie contenant les fichiers toujours organisés en sous-répertoires et prtant toujours le même nom, mais avec les informations provenant des deux répertoires en entrée.
+* **-i** JAVAOUTR : répertoire en sortie de la première étape ;
+* **-g** JAVAOUTD : répertoire en sortie de la seconde étape ;
+* **-o** JAVAOUT : répertoire de sortie contenant les fichiers toujours organisés en sous-répertoires et prtant toujours le même nom, mais avec les informations provenant des deux répertoires en entrée.
 
 ##### Format fichiers en sortie : TODO (très moche)
 
 
-### readCorpus/py/readCorpus.py : 
+# Code : *ReaDiC/py/readCorpus.py* 
 
-Lit les fichiers en sortie de l'étape précédente et écrit en sortie des fichiers de traits. **Les raccourcis pour les options ne sont pas (toujours) les mêmes si le script est utilisé seul, ils sont indiqués ici entre parenthèses**. Certaines options sont obligatoire (req) et d'autres ont une valeur par défaut (not req:default).
+Lit les fichiers en sortie de l'étape précédente et écrit en sortie des fichiers de traits. Certaines options sont obligatoire (req) et d'autres ont une valeur par défaut (not req:default).
+
+Environ 40s.
 
 Require : nltk version ? python version ?
 
-##### Options :
+### Options :
 
-* **-j (-b)** JAVAOUT (req) : le répertoire contenant les fichiers en sortie des 3 étapes précédentes (**sauf pour l'instant pour les instances de type discourse reading**, nécessite le répertoire en sortie de la seconde étape) ;
-* **-o (-o)** OUT  (not req:~/readCorpus_out/) : répertoires où seront créés les répertoires et fichiers en sortie (décrits ci-dessous) ;
-* **-l (-l)** LABELS (req) : le même fichier de relations que précédemment ;
-* **-n (-n)** LEVEL (not req:-1) : le niveau d'annotation voulu au niveau de la hiérarchie de relations, soit on conserve tous les exemples avec les relations les plus profondes annotées (-1), soit les exemples annotés au niveau 1 (1), au niveau 2 (2) ou au niveau (3) ;
-* **-c (-d)** CORPUS (not req:pdtb) : le type de corpus lu, normalement entre pdtb, bllip, annodis mais seul pdtb est implémenté (option inutile pour l'instant) ;
-* **-t (-t)** TYPE (not req:implicit) : le type d'instance conservé, entre implicit, explicit, altlex, entrel, norel, discoursereading (en cours : position). On peut combiner ces types, par ex. implicit+explicit ;
-* **-f (-f)** FEATS (not req:all) : le type de traits que l'on veut utiliser, par exemple bigram, prodrules, wang, park, pitler ou all (tous les traits, dépend du type d'instance conservé). La liste complète des traits disponibles est donné infra. Ces traits peuvent être combinés, par ex. bigram+prodrules ;
-* **-s (-s)** SPLIT (not req:2-21:00#01#22#24:23) : le split train/dev/test à utiliser en termes de section, de la forme train:dev:test, avec train = XX-ZZ (de la section XX incluse à la section ZZ incluse), dev ou test = XX(#ZZ#TT) (la section XX et la section ZZ et la section TT). La valeur par défaut correspond au split de Lin09 (recommendation du manuel du PDTB), le split de Pitler ou Wang est obtenu avec 2-20:00#01#23#24:21#22 ;
-* **-z (-m)** ANNOTATION (not req:1A) : certains exemples peuvent être annotés avec plusieurs relations, les implicites peuvent recevoir jusqu'à 4 relations (1A, 1B, 2A et 2B), les explicites jusqu'à 2 (1A et 1B). On peut donc choisir de ne conserver que la première relation annotée (1A) ou dupliquer les exemples (avec des relations différentes) pour chaque relation annotée. On conserve toujours les annotations supérieures (ie : si on choisit 1B, on conserve aussi 1A) ;
-* **-a (-a)** FEATALPHA (not req:$OUT/correspondance_featsnum2featname.txt) : fichier contenant l'alphabet de traits, ie tous les traits utilisés et leur correspondance numérique (pour format svmlight). Si aucun fichier n'est donné, le fichier est créé. Si un fichier est donné, il est utilisé pour trouver la correspondance numérique pour les traits calculés, et les nouveaux traits sont ajoutés à la fin du fichier ;
-* **-m (-c)** CONNECTIVES (not req:None) : la liste/le lexique de connecteurs (non utilisé pour l'instant) ;
-* **-s (-r)** RESSOURCES (not req:readCorpus/data/ressources/) : répertoire contenant des lexiques utilisés pour calculer certains traits (classes de Levin, lexique de subjectivité, Inquirer) ;
-* **-x (-x)** MODE (not req:all) : en mode read, des fichiers au format colonne (décrits ci-dessous) sont produits en plus des fichiers de traits.
+* **-b** JAVAOUT (req) : le répertoire contenant les fichiers en sortie des 3 étapes précédentes (**sauf pour l'instant pour les instances de type discourse reading**, nécessite le répertoire en sortie de la seconde étape) ;
+* **-o** OUT  (not req:~/readCorpus_out/) : répertoires où seront créés les répertoires et fichiers en sortie (décrits ci-dessous) ;
+* **-l** LABELS (req) : le même fichier de relations que précédemment ;
+* **-n** LEVEL (not req:-1) : le niveau d'annotation voulu au niveau de la hiérarchie de relations, soit on conserve tous les exemples avec les relations les plus profondes annotées (-1), soit les exemples annotés au niveau 1 (1), au niveau 2 (2) ou au niveau (3) ;
+* **-d** CORPUS (not req:pdtb) : le type de corpus lu, normalement entre pdtb, bllip, annodis mais seul pdtb est implémenté (option inutile pour l'instant) ;
+* **-t** TYPE (not req:implicit) : le type d'instance conservé, entre implicit, explicit, altlex, entrel, norel, discoursereading (en cours : position). On peut combiner ces types, par ex. implicit+explicit ;
+* **-f** FEATS (not req:all) : le type de traits que l'on veut utiliser, par exemple bigram, prodrules, wang, park, pitler ou all (tous les traits, dépend du type d'instance conservé). La liste complète des traits disponibles est donné infra. Ces traits peuvent être combinés, par ex. bigram+prodrules ;
+* **-s** SPLIT (not req:2-21:00#01#22#24:23) : le split train/dev/test à utiliser en termes de section, de la forme train:dev:test, avec train = XX-ZZ (de la section XX incluse à la section ZZ incluse), dev ou test = XX(#ZZ#TT) (la section XX et la section ZZ et la section TT). La valeur par défaut correspond au split de Lin09 (recommendation du manuel du PDTB), le split de Pitler ou Wang est obtenu avec 2-20:00#01#23#24:21#22 ;
+* **-m** ANNOTATION (not req:1A) : certains exemples peuvent être annotés avec plusieurs relations, les implicites peuvent recevoir jusqu'à 4 relations (1A, 1B, 2A et 2B), les explicites jusqu'à 2 (1A et 1B). On peut donc choisir de ne conserver que la première relation annotée (1A) ou dupliquer les exemples (avec des relations différentes) pour chaque relation annotée. On conserve toujours les annotations supérieures (ie : si on choisit 1B, on conserve aussi 1A) ;
+* **-a** FEATALPHA (not req:$OUT/correspondance_featsnum2featname.txt) : fichier contenant l'alphabet de traits, ie tous les traits utilisés et leur correspondance numérique (pour format svmlight). Si aucun fichier n'est donné, le fichier est créé. Si un fichier est donné, il est utilisé pour trouver la correspondance numérique pour les traits calculés, et les nouveaux traits sont ajoutés à la fin du fichier ;
+* **-c** CONNECTIVES (not req:None) : la liste/le lexique de connecteurs (non utilisé pour l'instant) ;
+* **-r** RESSOURCES (not req:readCorpus/data/ressources/) : répertoire contenant des lexiques utilisés pour calculer certains traits (classes de Levin, lexique de subjectivité, Inquirer) ;
+* **-x** MODE (not req:all) : en mode read, des fichiers au format colonne (décrits ci-dessous) sont produits en plus des fichiers de traits.
 
-##### Format fichiers en sortie :
+### Sortie :
 * Les fichiers de traits comportent une instance par ligne, les instances ont le format : 
 
 (ID) label trait1:val1 trait2:val2. 
@@ -94,3 +106,25 @@ Le format svmlight correspond à des noms de traits au format numérique (ie tra
 * un **répertoire train_dev_test_FFF** (FFF = la valeur de l'option FEATS) contenant les fichiers de train, dev et test selon le split $SPLIT choisi. Les fichiers ont la forme trainSPLIT_DU_TRAIN.(no)id.txt (par ex. train2-21.id.txt et train2-21.noid.txt). Le fichier en .id contient les ID des exemples en début de ligne. Les fichiers en .noid ne contiennent plus ces id. Les exemples ont été mélangés aléatoirement pour chaque corpus. Ces fichiers sont au format svmlight ;
 * le fichier **alphabet de traits** $FEATALPHA décrits plus haut est soit créé soit modifié ;
 * éventuellement, en mode -x read, on obtient aussi en sortie un **répertoire read/** contenant des fichiers au format wsj_XXYY.read et  wsj_XXYY.read.simpl contenant tous les exemples dans un format colonne, la première ligne correspond aux catégories. Les fichiers wsj_XXYY.read.simpl contiennent moins d'informations pour rester lisibles.
+
+
+
+# Exemples
+
+### Script shell
+
+**Sans lancer la partie python**
+
+```
+./ReaDiC/read_pdtb_like.sh -l ReaDiC/data/ressources/pdtb_hierarchie_lin.txt 
+-e ReaDiC/data/ressources/head_rules.txt -r ReaDiC/data/data2test/PDTB/raw/ 
+-p ReaDiC/data/data2test/PDTB/ptb/ -d ReaDiC/data/data2test/PDTB/pdtb/ 
+-i ReaDiC/data/data2test/out/java_outR/ -g ReaDiC/data/data2test/out/java_outD/ 
+-j ReaDiC/data/data2test/out/java_out/ -m ReaDiC/data/ressources/connective_pdtb.tx`
+```
+
+
+# TODO
+
+* Supprimer l'argument "labels" dans le pdtb.jar
+* Modifier les affichages des parties Java (un peu le bazar ..)
