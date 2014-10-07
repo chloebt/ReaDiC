@@ -103,6 +103,32 @@ Require : nltk version ? python version ?
 * le fichier **alphabet de traits** FEATALPHA décrits plus haut est soit créé soit modifié ;
 * éventuellement, en mode -x read, on obtient aussi en sortie un **répertoire read/** contenant des fichiers au format wsj_XXYY.read et  wsj_XXYY.read.simpl contenant tous les exemples dans un format colonne, la première ligne correspond aux catégories. Les fichiers wsj_XXYY.read.simpl contiennent moins d'informations pour rester lisibles.
 
+
+
+# Exemples
+
+### Script shell
+
+**Sans lancer la partie python**
+
+```
+./ReaDiC/read_pdtb_like.sh -l ReaDiC/data/ressources/pdtb_hierarchie_lin.txt -e ReaDiC/data/ressources/head_rules.txt -r ReaDiC/data/data2test/PDTB/raw/ -p ReaDiC/data/data2test/PDTB/ptb/ -d ReaDiC/data/data2test/PDTB/pdtb/ -i ReaDiC/data/data2test/out/java_outR/ -g ReaDiC/data/data2test/out/java_outD/ -j ReaDiC/data/data2test/out/java_out/ -m ReaDiC/data/ressources/connective_pdtb.tx`
+```
+
+### Script python
+
+Pour créer des fichiers de traits pour les exemples explicites, annotés avec des relations de niveau 1, en ne conservant que la première annotation, avec des traits de type *connective* (uniquement la forme de connecteur comme trait), avec un split train:sections 00 et 01, dev:section 02, test:section 03 :
+
+```
+python ReaDiC/py/readCorpus.py -b ReaDiC/data/data2test/out/java_out/ -o ReaDiC/data/data2test/out/read/explicit_connective_lvl1/ -l ReaDiC/data/ressources/pdtb_hierarchie.txt -a ReaDiC/data/data2test/out/read/lexfeats.txt -s 0-1:02:03  -t explicit -n 1 -m 1A
+```
+
+Pour créer des fichiers de traits pour les exemples implicites, annotés avec des relations de niveau 2 (mais en ne conservant que les relations conservées par Lin, car utilisation du fichier *pdtb_hierarchie_lin.txt*), en ne conservant que la première annotation, avec des traits de type *bigram* (bigrammes sur chaque argument), avec un split train:sections 00 et 01, dev:section 02, test:section 03 :
+
+```
+python ReaDiC/py/readCorpus.py -b ReaDiC/data/data2test/out/java_out/ -o ReaDiC/data/data2test/out/read/implicit_bigram_lvl2/ -l ReaDiC/data/ressources/pdtb_hierarchie_lin.txt -a ReaDiC/data/data2test/out/read/lexfeats.txt -s 0-1:02:03 -t implicit -f bigram -n 2 -m 1A 
+```
+
 ### Traits utilisables
 
 **Le connecteur des exemples explicites n'apparaît pas dans les arguments**, donc si on ne prend pas de traits concernant le connecteur pour des explicites, on obtient des instances de type artificiel.
@@ -194,31 +220,6 @@ La plupart des traits sont utilisables indifféremment pour des exemples de type
 * *all* : selon le type,
   * implicit : prend tous les traits de la première liste (sauf les groupes),
   * explicit : prend tous les traits de la seconde liste (sauf les groupes).
-
-# Exemples
-
-### Script shell
-
-**Sans lancer la partie python**
-
-```
-./ReaDiC/read_pdtb_like.sh -l ReaDiC/data/ressources/pdtb_hierarchie_lin.txt -e ReaDiC/data/ressources/head_rules.txt -r ReaDiC/data/data2test/PDTB/raw/ -p ReaDiC/data/data2test/PDTB/ptb/ -d ReaDiC/data/data2test/PDTB/pdtb/ -i ReaDiC/data/data2test/out/java_outR/ -g ReaDiC/data/data2test/out/java_outD/ -j ReaDiC/data/data2test/out/java_out/ -m ReaDiC/data/ressources/connective_pdtb.tx`
-```
-
-### Script python
-
-Pour créer des fichiers de traits pour les exemples explicites, annotés avec des relations de niveau 1, en ne conservant que la première annotation, avec des traits de type *connective* (uniquement la forme de connecteur comme trait), avec un split train:sections 00 et 01, dev:section 02, test:section 03 :
-
-```
-python ReaDiC/py/readCorpus.py -b ReaDiC/data/data2test/out/java_out/ -o ReaDiC/data/data2test/out/read/explicit_connective_lvl1/ -l ReaDiC/data/ressources/pdtb_hierarchie.txt -a ReaDiC/data/data2test/out/read/lexfeats.txt -s 0-1:02:03  -t explicit -n 1 -m 1A
-```
-
-Pour créer des fichiers de traits pour les exemples implicites, annotés avec des relations de niveau 2 (mais en ne conservant que les relations conservées par Lin, car utilisation du fichier *pdtb_hierarchie_lin.txt*), en ne conservant que la première annotation, avec des traits de type *bigram* (bigrammes sur chaque argument), avec un split train:sections 00 et 01, dev:section 02, test:section 03 :
-
-```
-python ReaDiC/py/readCorpus.py -b ReaDiC/data/data2test/out/java_out/ -o ReaDiC/data/data2test/out/read/implicit_bigram_lvl2/ -l ReaDiC/data/ressources/pdtb_hierarchie_lin.txt -a ReaDiC/data/data2test/out/read/lexfeats.txt -s 0-1:02:03 -t implicit -f bigram -n 2 -m 1A 
-```
-
 
 # TODO
 
